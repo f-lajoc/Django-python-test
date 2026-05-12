@@ -1,0 +1,46 @@
+{% load static %}
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>{% block titlename %} {% endblock titlename %}</title>
+		<link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+		{% block style %}  {% endblock style %}
+	</head>
+	<body>
+		<header>
+			<nav>
+				<ul>
+					<li><a href="{% url 'home' %}">Home</a></li>
+					<li><a href="{% url 'about' %}">About</a></li>
+					<li><a href="{% url 'contact' %}">Contact</a></li>
+
+					{% if user.is_authenticated %}
+					<li><a href="{% url 'logout' %}">Logout</a></li>
+					{% else %}
+					<li><a href="{% url 'signup' %}">Signup</a></li>
+					<li><a href="{% url 'login' %}">Login</a></li>
+					{% endif %}
+					<li><a href="{% url 'testimony' %}">Testimonials</a></li>
+				</ul>
+			</nav>
+		</header>
+
+		<main>
+			<div class="error_container">
+				{% for msg in messages %}
+				<p>{{msg}}</p>
+				{% endfor %}
+			</div>
+
+			{% block main %} {% endblock main %}
+		</main>
+
+		<footer>
+			<p>@ lajoc_devs</p>
+		</footer>
+	</body>
+</html>
