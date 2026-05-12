@@ -284,3 +284,4 @@ def homepage(request):
 - 
 # .gitignore
 - create a .gitignore file, go to gitignore.io, search for the software you're using on it (Django, React), copy and paste everything in the gitignore
+# To deploy on Render
