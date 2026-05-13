@@ -285,3 +285,21 @@ def homepage(request):
 # .gitignore
 - create a .gitignore file, go to gitignore.io, search for the software you're using on it (Django, React), copy and paste everything in the gitignore
 # To deploy on Render
+- Go to: Render Dashboard
+- Click: New + → Web Service
+- Connect your GitHub repo:
+- Fill manually: Runtime → Python
+- On terminal install gunicorn `pip install gunicorn`, Render needs it.
+- then Generate requirements.txt with `pip freeze > requirements.txt`, ensure you're at the root folder
+- Push to GitHub `git add .
+git commit -m "Added requirements.txt"
+git push`
+- Open the settings.py and change the 'ALLOWED_HOSTS = []' to `ALLOWED_HOSTS = [
+    "django-python-test.onrender.com",
+    "localhost",
+    "127.0.0.1",
+]`
+- Also change: 'DEBUG = True' to `DEBUG = False`
+-then  Push to GitHub `git add .
+git commit -m "Configured ALLOWED_HOSTS for Render"
+git push`
