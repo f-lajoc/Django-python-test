@@ -2,3 +2,22 @@ body{
  background-color: black;
  color: whitesmoke;
 }
+
+.all_products{
+ display: flex;
+}
+.product-card:hover{
+ scale: .8;
+}
+.product-card{
+ margin: 10px;
+ border: 1px solid red;
+ border-radius: 20px;
+ width: 300px;
+ text-align: center;
+ transition: scale .5s ease-in;
+}
+.product-card img{
+ width: 100px;
+ object-fit: contain;
+}

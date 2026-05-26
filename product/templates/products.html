@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %} Product Listing Page {% endblock title %}
+
+{% block main %} 
+ <h1>All Available Products</h1>
+
+ <div class="all_products">
+{% for prod in all_productskey %}
+
+<div class="product-card">
+ <h3>Name: {{prod.name}}</h3>
+ <img src="{{prod.image.url}}" alt="{{prod.name}}">
+ <p>Description: {{prod.description}}</p>
+ <p>Quantity: {{prod.quantity}}</p>
+ <p>Seller: {{prod.user.username}}</p>
+
+
+ {% if prod.user == user %}
+ <a href="{% url 'edit-product' prod.id %}"> <button class="buy-btn">Edit</button></a>
+ <a href="{% url 'delete-product' prod.id %}"> <button class="buy-btn">Delete</button></a>
+ {% else %}
+ <button class="buy-btn">Buy</button>
+ {% endif %}
+
+</div>
+
+{% endfor %}
+ </div>
+
+ <a href="{% url 'add-product' %}"><button id="upload-btn">Upload a Product</button></a>
+{% endblock main %}
