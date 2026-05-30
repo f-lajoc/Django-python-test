@@ -3,6 +3,8 @@ from django.views import View
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from product.models import Product
+from django.http import JsonResponse
+from django.forms import model_to_dict
 from django.contrib import messages
 
 # Create your views here.
@@ -94,3 +96,36 @@ def delete_product(request, product_id):
       product.delete()
       messages.success(request, "Product successfully removed")
       return redirect(resolve_url("products"))
+
+
+def list_products(request):
+   all_products = Product.objects.all()
+   data = [{'name': x.name, 'id': x.id, 'quantity': x.quantity, 'image': x.image.url} for x in all_products]
+   return JsonResponse(data, safe=False)
+   
+@login_required
+def buy_product(request, product_id):
+      product = Product.objects.filter(id=product_id).first()
+      if not product:
+         return redirect(resolve_url("products"))
+      if product.user == request.user:
+         messages.error(request, "You cannot buy your own product")
+         return redirect(resolve_url("products"))
+      if request.method == "POST":
+         quantity = request.POST.get("qty")
+         try:
+            quantity = int(quantity)
+         except:
+            messages.error(request, "Value must be an integer")
+            return redirect(resolve_url("buy-product"))
+         if quantity < 1:
+            messages.error(request, "Quantity is too low")
+            return redirect(resolve_url("buy-product"))
+         if product.quantity < quantity:
+            messages.error(request, "Not enough products in stock")
+            return redirect(resolve_url("buy-product"))
+         product.quantity -= quantity
+         product.save()
+         messages.success(request, "Product successfully bought")
+         return redirect(resolve_url("products"))
+      return render(request, 'buy-product.html')

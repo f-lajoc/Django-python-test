@@ -383,7 +383,8 @@ git push`
 # to edit a product
 - ref to product urls.py, the path will have `<>` for dynamic input of the product id e.g `path('edit-product/<str:product_id>', EditProduct.as_view(), name='edit-product')`
 - in product views.py, for the edirproduct view make checks to see it is the seller trying to update the product e.g
-- `class EditProduct(LoginRequiredMixin, View):  
+- ```python
+  class EditProduct(LoginRequiredMixin, View):  
    def get(self, request, product_id):
       product = Product.objects.filter(id=product_id).first()
       if not product:
@@ -412,11 +413,26 @@ git push`
       product.image = image or  product.image
       product.save()
       messages.success(request, "Product successfully updated")
-      return redirect(resolve_url("products"))`
-- then go to the editproduct html and the input boxes there put value to populate with the already existing informations of the product e.g 
-```
+      return redirect(resolve_url("products"))```
+- then go to the editproduct html and the input boxes there put value to populate with the already existing informations of the product e.g
+```html
 <label for="">Name</label></br>
 <input type="text" name="name" required value="{{product.name}}"></br>
 <label for="">Description</label></br>
 <textarea name="description">{{product.description}}</textarea></br>
+```
+# Json response
+- to return json list of all our products, import Json Response by `from django.http import JsonResponse` and define a function in views.py e.g 
+- `def list_products(request):`
+- then import and add the view to path in urls.py e.g ` path("products/all", list_products, name="all-prod")`
+- we convert the list of objects to a  dicionary we can send back to user, import in views.py `from django.forms import model_to_dict` this will convert all models to dictionary e.g 
+   ```def list_products(request):
+   all_products = Product.objects.all()
+   data = [{'name': x.name, 'id': x.id, 'quantity': x.quantity, 'image': x.image.url} for x in all_products]
+   return JsonResponse(data, safe=False)```
+#  models products named properly in admin dashboard
+- go to product models.py where we created the product, create a method in it and use the identifier you want 
+```
+  def __str__(self):
+    return f' {self.name} || {self.id}'
 ```

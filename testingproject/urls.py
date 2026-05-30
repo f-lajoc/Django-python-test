@@ -25,4 +25,6 @@ urlpatterns = [
     path('authz/', include('authz.urls')),
     path('product/', include('product.urls')),
 ]
-urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
