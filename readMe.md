@@ -1,41 +1,83 @@
-﻿# Django Project Setup & Deployment Guide
+﻿# Django Setup & Development Guide
 
 ## Overview
 
-This guide walks through setting up and running a Django web application from scratch on Windows, covering environment configuration, app creation, template rendering, form handling, user authentication, database management, static files, and deployment to Render. It is intended for developers who are new to Django or need a step-by-step reference for building their first project.
+A practical, step-by-step reference for building a Django web application from scratch — environment setup, routing, templates, forms, models, authentication, file uploads, error handling, and deployment to Render.
+
+This guide is written as a working reference for Django beginners and as a personal knowledge base compiled while learning the framework hands-on.
 
 ---
 
 ## Table of Contents
 
-1. [Prerequisites](#prerequisites)
-2. [Setting Up a Virtual Environment](#setting-up-a-virtual-environment)
-3. [Installing Django](#installing-django)
-4. [Starting the Development Server](#starting-the-development-server)
-5. [Creating a Django App](#creating-a-django-app)
-6. [Registering the App](#registering-the-app)
-7. [Templates](#templates)
-8. [Views](#views)
-9. [URL Configuration](#url-configuration)
-10. [Template Inheritance (Blocks)](#template-inheritance-blocks)
-11. [Form Submission](#form-submission)
-12. [Backend Validation & Flash Messages](#backend-validation--flash-messages)
-13. [Redirect and Resolve](#redirect-and-resolve)
-14. [Database Models](#database-models)
-15. [Django Admin Panel](#django-admin-panel)
-16. [User Authentication](#user-authentication)
-17. [Login-Required Protection](#login-required-protection)
-18. [Static Files (CSS, JS, Images)](#static-files-css-js-images)
-19. [Media & File Uploads](#media--file-uploads)
-20. [Comments in Python](#comments-in-python)
-21. [.gitignore](#gitignore)
-22. [Deploying to Render](#deploying-to-render)
+- [Django Setup \& Development Guide](#django-setup--development-guide)
+  - [Overview](#overview)
+  - [Table of Contents](#table-of-contents)
+  - [1. Prerequisites](#1-prerequisites)
+    - [Check if Python is installed](#check-if-python-is-installed)
+    - [Check if pip is installed](#check-if-pip-is-installed)
+  - [2. Environment Setup](#2-environment-setup)
+    - [Install virtualenv](#install-virtualenv)
+    - [Create a virtual environment](#create-a-virtual-environment)
+    - [Activate the virtual environment](#activate-the-virtual-environment)
+  - [3. Creating the Django Project](#3-creating-the-django-project)
+    - [Comments in Python](#comments-in-python)
+    - [Start the development server](#start-the-development-server)
+  - [4. Creating and Registering an App](#4-creating-and-registering-an-app)
+    - [Register the app](#register-the-app)
+    - [Wire up the app's URLs](#wire-up-the-apps-urls)
+  - [5. Templates](#5-templates)
+  - [6. Views](#6-views)
+    - [Function-based views](#function-based-views)
+  - [7. URL Routing \& Linking Pages](#7-url-routing--linking-pages)
+    - [Wiring a view to a URL](#wiring-a-view-to-a-url)
+    - [Adding more pages](#adding-more-pages)
+    - [Linking pages in templates](#linking-pages-in-templates)
+  - [8. Template Inheritance with Blocks](#8-template-inheritance-with-blocks)
+    - [Including partial templates](#including-partial-templates)
+  - [9. Handling Form Submissions](#9-handling-form-submissions)
+    - [Reading submitted data](#reading-submitted-data)
+  - [10. Displaying Backend Messages](#10-displaying-backend-messages)
+    - [Rendering messages in a template](#rendering-messages-in-a-template)
+  - [11. Redirects](#11-redirects)
+  - [12. Class-Based Views](#12-class-based-views)
+    - [Checking for code errors](#checking-for-code-errors)
+  - [13. Models \& the Database](#13-models--the-database)
+    - [Saving data to the database](#saving-data-to-the-database)
+    - [Using non-sequential (UUID) primary keys](#using-non-sequential-uuid-primary-keys)
+    - [Linking records with a foreign key](#linking-records-with-a-foreign-key)
+  - [14. Admin Panel](#14-admin-panel)
+    - [Registering a model](#registering-a-model)
+    - [Making records human-readable](#making-records-human-readable)
+  - [15. User Authentication (Signup, Login, Logout)](#15-user-authentication-signup-login-logout)
+    - [Signup](#signup)
+    - [Login](#login)
+    - [Logout](#logout)
+    - [Conditional navigation based on login state](#conditional-navigation-based-on-login-state)
+  - [16. Restricting Access to Logged-In Users](#16-restricting-access-to-logged-in-users)
+    - [Redirecting back to the originally requested page](#redirecting-back-to-the-originally-requested-page)
+  - [17. Static Files (CSS, JS, Images)](#17-static-files-css-js-images)
+  - [18. Media \& File Uploads](#18-media--file-uploads)
+  - [19. .gitignore](#19-gitignore)
+  - [20. Rendering and Linking Model Data](#20-rendering-and-linking-model-data)
+    - [File uploads in forms](#file-uploads-in-forms)
+  - [21. Editing Existing Records](#21-editing-existing-records)
+  - [22. JSON Responses](#22-json-responses)
+  - [23. Readable Admin Labels](#23-readable-admin-labels)
+  - [24. Slugs (SEO-Friendly URLs)](#24-slugs-seo-friendly-urls)
+    - [Using slugs instead of IDs throughout the project](#using-slugs-instead-of-ids-throughout-the-project)
+  - [25. Custom Error Pages (404 / 500)](#25-custom-error-pages-404--500)
+  - [26. Secret Keys \& Environment Variables](#26-secret-keys--environment-variables)
+    - [Keeping secrets out of source control](#keeping-secrets-out-of-source-control)
+  - [27. Cloud Storage for Media](#27-cloud-storage-for-media)
+  - [28. Deploying to Render](#28-deploying-to-render)
+  - [29. Serving Static Files in Production (WhiteNoise)](#29-serving-static-files-in-production-whitenoise)
 
 ---
 
-## Prerequisites
+## 1. Prerequisites
 
-### Check Python Installation
+### Check if Python is installed
 
 Open Command Prompt and run:
 
@@ -43,9 +85,11 @@ Open Command Prompt and run:
 python --version
 ```
 
-If Python is not installed, download the latest version from [python.org](https://python.org) and run the installer. Check all boxes during installation, then confirm the installation by running the command above again.
+If Python isn't installed, download the latest version from [python.org](https://www.python.org) and run the installer. Accept all the default prompts during installation.
 
-### Check pip Installation
+Reopen Command Prompt afterward and re-run `python --version` to confirm the installation succeeded.
+
+### Check if pip is installed
 
 ```bash
 pip --version
@@ -53,9 +97,7 @@ pip --version
 
 ---
 
-## Setting Up a Virtual Environment
-
-It is good practice to always use a virtual environment in Python projects. A virtual environment creates an isolated space for each project's dependencies, preventing version conflicts between projects.
+## 2. Environment Setup
 
 ### Install virtualenv
 
@@ -63,89 +105,102 @@ It is good practice to always use a virtual environment in Python projects. A vi
 pip install virtualenv
 ```
 
-### Create the Virtual Environment
+> **Why use a virtual environment?**
+> A virtual environment isolates the dependencies for each project. For example, if Project A uses Python 3 and Project B uses a newer version, a virtual environment keeps their packages separate so that installing or updating one project never breaks the other.
 
-Run this in your project terminal (e.g., VS Code):
+### Create a virtual environment
+
+Run this in your project's terminal (VS Code or otherwise). You can name it anything, but `env` or `venv` is recommended — `.gitignore` templates for Django already exclude `env` by default. If you use a different name, you'll need to add it to `.gitignore` manually.
 
 ```bash
 python -m venv env
 ```
 
-> **Note:** You can name your environment anything, but `env` or `venv` are recommended because `.gitignore` templates automatically exclude them. If you use a different name, you will need to add it manually to `.gitignore`.
-
-### Activate the Virtual Environment
+### Activate the virtual environment
 
 **Windows:**
 ```bash
-env\Scripts\activate
+env\scripts\activate
 ```
 
-**Mac/Linux:**
+**macOS / Linux:**
 ```bash
 source env/bin/activate
 ```
 
-> **Note:** If Windows blocks the activation script, switch your terminal from PowerShell to Command Prompt and run the command again.
+> **Note:** If Windows blocks the script with a "disabled" error, this is usually caused by PowerShell's execution policy. Switch to Command Prompt and run the activation command again.
 
-You will need to reactivate the virtual environment each time you return to the project.
-
-### Install Project Packages
-
-Once the virtual environment is active, install packages as needed. Example:
+Once active, your terminal prompt will be prefixed with `(env)`, confirming you're working inside the virtual environment — for example:
 
 ```bash
-pip install django
+(env) PS C:\Users\user\OneDrive\Desktop\PYTHON>
 ```
+
+Install all project packages while this prefix is visible. You'll need to reactivate the environment (`env\scripts\activate`) every time you return to the project in a new terminal session.
 
 ---
 
-## Installing Django
+## 3. Creating the Django Project
+
+Install Django:
 
 ```bash
 pip install django
 ```
 
-Create a new Django project:
+Create the project:
 
 ```bash
 django-admin startproject projectname .
 ```
 
-> **Note:** The `.` at the end is important because without it, Django creates a nested project folder.
+> The trailing `.` matters — without it, Django creates a nested project folder instead of placing files in the current directory.
 
-Do not modify the `manage.py` file.
+**Do not modify `manage.py`.**
 
----
+### Comments in Python
 
-## Starting the Development Server
+```python
+# Single-line comment
+
+"""
+Multi-line comment
+or docstring
+"""
+```
+
+### Start the development server
 
 ```bash
 python manage.py runserver
 ```
 
-Open the port shown in the terminal in your browser. To stop the server, press `Ctrl + C`.
+Then open the printed local address in your browser. Press `Ctrl + C` to stop the server.
 
-> **Security tip:** Change the default `admin/` path in `urls.py` to something less predictable to reduce exposure to automated attacks:
+> **Security tip:** Change the default `admin/` path in `urls.py` to something less predictable, to reduce the risk of automated attacks:
 > ```python
 > urlpatterns = [
->     path('dashboard/', admin.site.urls),
+>     path('anynameyouwant/', admin.site.urls),
 > ]
 > ```
 
 ---
 
-## Creating a Django App
+## 4. Creating and Registering an App
 
+Create an app:
+
+```bash
+django-admin startapp appname
+```
+or
 ```bash
 python manage.py startapp appname
 ```
 
----
+### Register the app
 
-## Registering the App
-
-1. Open `settings.py` in your project folder.
-2. Add your app name to the `INSTALLED_APPS` list:
+In the project's `settings.py`, add the app to `INSTALLED_APPS`:
 
 ```python
 INSTALLED_APPS = [
@@ -155,121 +210,112 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'appname',  # your app
+    'apptest',
 ]
 ```
 
-3. Create a `urls.py` file inside your app folder and add:
+### Wire up the app's URLs
+
+In the app folder, create `urls.py`:
 
 ```python
 from django.urls import path
 
-urlpatterns = []
+urlpatterns = [
+    # app-specific paths go here
+]
 ```
 
-4. In the project's `urls.py`, import `include` and add a path for your app:
+In the project's `urls.py`, include the app's URLs:
 
 ```python
 from django.urls import path, include
 
 urlpatterns = [
-    path('', include('appname.urls')),           # handles all root-level requests
-    path('appname/', include('appname.urls')),   # handles requests prefixed with appname/
+    path('', include('apptest.urls')),          # root routes to the app
+    path('apptest/', include('apptest.urls')),  # or under a prefix
 ]
 ```
 
 ---
 
-## Templates
+## 5. Templates
 
-In `settings.py`, locate the `TEMPLATES` configuration block. The recommended approach is to create a `templates` folder inside each app directory, so each app manages its own templates.
+In `settings.py`, under the `TEMPLATES` setting, either point `'DIRS': []` to a shared templates folder, or — the more common approach — create a `templates/` folder inside each app so every app owns its own templates.
 
-Create HTML files inside the `templates` folder.
+Create your `.html` files inside that folder.
 
 ---
 
-## Views
+## 6. Views
 
-Navigate to `views.py` in your app folder.
+Django supports two styles of views:
 
-Django supports two types of views:
+- **Function-based views (FBVs)** — simpler to learn, but require more repeated code.
+- **Class-based views (CBVs)** — a slightly steeper learning curve, but more concise (see [Section 12](#12-class-based-views)).
 
-### Function-Based Views
-
-Easier to learn and suitable for most use cases:
+### Function-based views
 
 ```python
 def homepage(request):
     return render(request, 'home.html')
 ```
 
-### Class-Based Views
+---
 
-More concise for complex views:
+## 7. URL Routing & Linking Pages
+
+### Wiring a view to a URL
+
+Import the view and register its path:
 
 ```python
-from django.views import View
+from apptest.views import homepage
 
-class ContactView(View):
-    def get(self, request):
-        return render(request, 'contact.html')
+urlpatterns = [
+    path('', homepage),
+]
+```
 
-    def post(self, request):
-        return render(request, 'contact.html')
+### Adding more pages
+
+1. Create the new template in the templates folder.
+2. Define the view:
+   ```python
+   def aboutpage(request):
+       return render(request, 'about.html')
+   ```
+3. Register the path:
+   ```python
+   path('about', aboutpage)
+   ```
+
+### Linking pages in templates
+
+Name your URL in `urls.py`:
+
+```python
+path('', homepage, name='home')
+```
+
+Then reference it in a template using the `url` tag rather than a hardcoded path:
+
+```html
+<a href="{% url 'about' %}">About Her</a>
 ```
 
 ---
 
-## URL Configuration
+## 8. Template Inheritance with Blocks
 
-### Function-Based Views
+Blocks let child templates override specific sections of a shared base template — ideal for elements common to every page, like the title or main content area, while still letting each page customize its own content.
 
-In your app's `urls.py`:
-
-```python
-from django.urls import path
-from appname.views import homepage, aboutpage
-
-urlpatterns = [
-    path('', homepage, name='home'),
-    path('about', aboutpage, name='about'),
-]
-```
-
-### Class-Based Views
-
-```python
-from appname.views import ContactView
-
-urlpatterns = [
-    path('contact', ContactView.as_view(), name='contact'),
-]
-```
-
-### Linking Pages in Templates
-
-Use the `{% url %}` tag to reference named URL patterns:
-
+**base.html:**
 ```html
-<a href="{% url 'about' %}">About</a>
+<title>{% block titlename %}{% endblock titlename %}</title>
 ```
 
----
-
-## Template Inheritance (Blocks)
-
-Create a `base.html` file that contains elements common to all pages (e.g., navigation, header, footer). Use blocks to define areas that child pages can override:
-
-```html
-<!-- base.html -->
-<title>{% block title %}{% endblock title %}</title>
-
-<body>
-    {% block main %}{% endblock main %}
-</body>
-```
-
-In child pages, extend the base and fill in the blocks:
+Pages that extend `base.html` don't need to repeat the `<!DOCTYPE>` or other boilerplate — they inherit everything automatically:
 
 ```html
 {% extends 'base.html' %}
@@ -277,12 +323,14 @@ In child pages, extend the base and fill in the blocks:
 {% block title %}Homepage{% endblock title %}
 
 {% block main %}
-    <h1>Welcome</h1>
-    <a href="{% url 'about' %}">About</a>
+  <h1>A girl named Fola</h1>
+  <a href="{% url 'about' %}">About Her</a>
 {% endblock main %}
 ```
 
-To include one template inside another (e.g., a testimonial section on the homepage):
+### Including partial templates
+
+Use `{% include %}` to embed one template inside another — useful for reusable sections like a testimonials block on the homepage:
 
 ```html
 {% include 'testimony.html' %}
@@ -290,19 +338,22 @@ To include one template inside another (e.g., a testimonial section on the homep
 
 ---
 
-## Form Submission
+## 9. Handling Form Submissions
 
-Use the `POST` method for form submissions to keep data out of the URL. Add `{% csrf_token %}` inside the form to prevent cross-site request forgery:
+Avoid the `GET` method for forms with sensitive data — it exposes all submitted values in the URL. Use `POST` instead, along with `{% csrf_token %}` in the form to protect against cross-site request forgery. Django generates a hidden, unique token automatically.
 
-```html
-<form method="POST">
-    {% csrf_token %}
-    <input type="text" name="fullname">
-    <button type="submit">Submit</button>
-</form>
+### Reading submitted data
+
+```python
+def contactpage(request):
+    if request.method == "POST":
+        fullname = request.POST["fullname"]
+        print(f'User submitted name {fullname}')
+        return render(request, 'contact.html')
+    return render(request, 'contact.html')
 ```
 
-Extract submitted data in `views.py` using `.get()` to avoid errors when a field is missing:
+> **Prefer `.get()` over direct key access.** Accessing `request.POST["key"]` raises an error if the key is missing. `request.POST.get("key")` returns `None` instead, so validation logic can run without crashing:
 
 ```python
 def contactpage(request):
@@ -310,17 +361,14 @@ def contactpage(request):
         fullname = request.POST.get("fullname")
         email = request.POST.get("email")
         about = request.POST.get("about")
-        print(f'Submitted by: {fullname}, Message: {about}')
-    return render(request, 'contact.html')
+        print(f'User submitted name {fullname}, about {about}')
 ```
 
 ---
 
-## Backend Validation & Flash Messages
+## 10. Displaying Backend Messages
 
-Django's built-in messages framework lets you send feedback from the backend to the frontend. It is included by default in `INSTALLED_APPS`.
-
-In `views.py`:
+Django's built-in `messages` framework (already part of `INSTALLED_APPS`) sends feedback from the backend to the frontend.
 
 ```python
 from django.contrib import messages
@@ -332,77 +380,136 @@ def contactpage(request):
         about = request.POST.get("about")
 
         if not fullname:
-            messages.error(request, "Please provide your full name.")
+            messages.error(request, "Please provide your full name")
             return render(request, 'contact.html')
         if not email or not about:
-            messages.error(request, "All fields are required.")
+            messages.error(request, "All fields are required")
             return render(request, 'contact.html')
         if len(fullname) < 5:
-            messages.error(request, "Name is too short.")
+            messages.error(request, "Name is too short")
             return render(request, 'contact.html')
 
-        messages.success(request, "Details submitted successfully.")
-    return render(request, 'contact.html')
+        messages.success(request, "Details submitted")
 ```
 
-Display messages in `base.html` so they appear on every page:
+> Django templates use the Jinja-style template language, similar in spirit to how React uses JSX.
+
+### Rendering messages in a template
+
+Since every page inherits from `base.html`, placing the message loop there makes feedback appear on any page:
 
 ```html
 <div class="error_container">
-    {% for msg in messages %}
-        <p>{{ msg }}</p>
-    {% endfor %}
+  {% for msg in messages %}
+    <p>{{ msg }}</p>
+  {% endfor %}
 </div>
 ```
 
-> **Note:** Django uses Jinja-style template syntax, similar to how React uses JSX.
-
 ---
 
-## Redirect and Resolve
-
-Import `redirect` and `resolve_url` from Django shortcuts to navigate users after a successful form submission:
+## 11. Redirects
 
 ```python
 from django.shortcuts import render, redirect, resolve_url
 
 return redirect(homepage)
-# or, if the view is in a different file:
+# or, when the target view lives in a different file:
 return redirect(resolve_url('home'))
 ```
 
 ---
 
-## Database Models
+## 12. Class-Based Views
 
-### Creating Models
+```python
+from django.views import View
 
-In `models.py`, create a class that extends `models.Model`:
+class Contactview(View):
+    def get(self, request):
+        return render(request, 'contact.html')
+
+    def post(self, request):
+        return render(request, 'contact.html')
+```
+
+> Class names should use **PascalCase** (first letter capitalized).
+
+Import and register the class-based view:
+
+```python
+from apptest.views import homepage, aboutpage, contactpage, testimonialpage, ContactView
+
+path('contact', ContactView.as_view(), name='contact')
+```
+
+### Checking for code errors
+
+```bash
+python manage.py check
+```
+
+> This check isn't exhaustive — it won't catch every possible error.
+
+---
+
+## 13. Models & the Database
+
+Define a model:
+
+```python
+from django.db import models
+
+class ContactMessage(models.Model):
+    fullname = models.CharField(max_length=250)
+    email = models.EmailField()
+```
+
+> Django automatically adds an `id` field to every model.
+
+Generate and apply migrations whenever a model is created or changed:
+
+```bash
+python manage.py makemigrations
+python manage.py migrate
+```
+
+Running `migrate` also clears warnings like:
+```
+You have 19 unapplied migration(s). Your project may not work properly
+until you apply the migrations for app(s): admin, auth, contenttypes, sessions.
+```
+
+### Saving data to the database
+
+```python
+from app.models import ModelName
+
+ModelName.objects.create(databaseField=value)
+# e.g.
+ContactMessage.objects.create(fullname=fullname, email=email, about=about)
+```
+
+### Using non-sequential (UUID) primary keys
+
+To avoid predictable, sequential IDs:
 
 ```python
 from django.db import models
 import uuid
 
-class ContactMessage(models.Model):
-    fullname = models.CharField(max_length=250)
-    email = models.EmailField()
-    about = models.TextField()
-    created_at = models.DateTimeField(auto_now_add=True)  # set on creation
-    updated_at = models.DateTimeField(auto_now=True)       # updated on save
-
-    def __str__(self):
-        return f'Name: {self.fullname} | Email: {self.email}'
+class Product(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, primary_key=True, editable=False)
+    name = models.CharField(max_length=250)
+    description = models.TextField()
+    price = models.PositiveBigIntegerField()
+    quantity = models.PositiveIntegerField()
+    image = models.ImageField()
 ```
 
-> **Note:** Django automatically adds an `id` field to every model.
+### Linking records with a foreign key
 
-To use a non-predictable UUID as the primary key:
-
-```python
-id = models.UUIDField(default=uuid.uuid4, primary_key=True, editable=False)
-```
-
-To link a model to a user (foreign key relationship):
+If, for example, products are posted by different users:
 
 ```python
 from django.contrib.auth.models import User
@@ -410,75 +517,58 @@ from django.contrib.auth.models import User
 user = models.ForeignKey(User, on_delete=models.CASCADE)
 ```
 
-### Running Migrations
-
-Run these two commands whenever you create or modify a model:
-
-```bash
-python manage.py makemigrations
-python manage.py migrate
-```
-
-### Saving Data from a Form
-
-In `views.py`, import the model and save submitted data:
-
-```python
-from appname.models import ContactMessage
-
-ContactMessage.objects.create(
-    fullname=fullname,
-    email=email,
-    about=about
-)
-```
-
-### Checking for Errors
-
-```bash
-python manage.py check
-```
-
-> **Note:** This command does not catch all errors but is useful for quick validation.
-
 ---
 
-## Django Admin Panel
+## 14. Admin Panel
 
-### Creating a Superuser
+Open the admin path defined in your project's `urls.py` to access the dashboard.
+
+Django has three user types: **SuperUser**, **StaffUser**, and **NormalUser**.
+
+Create a superuser:
 
 ```bash
 python manage.py createsuperuser
 ```
 
-Follow the prompts for username, email, and password. The password will not be visible as you type. If prompted about password strength, type `y` to bypass.
+You'll be prompted for a username, email, and password (input is hidden while typing).
 
-Django has three user types: **SuperUser**, **Staff User**, and **Normal User**.
+> If prompted with a "password not strong enough" warning, type `y` to bypass it if desired.
 
-### Registering a Model in Admin
+### Registering a model
 
-In `admin.py`:
+Models aren't visible in the admin panel by default. Register them in `admin.py`:
 
 ```python
-from django.contrib import admin
-from appname.models import ContactMessage
+from app.models import ModelName
 
-admin.site.register(ContactMessage)
+admin.site.register(ModelName)
 ```
 
-Reload the admin panel in your browser to see the registered model.
+### Making records human-readable
+
+Add a `__str__` method so records display meaningfully in the admin list, rather than as generic objects:
+
+```python
+class ContactMessage(models.Model):
+    fullname = models.CharField(max_length=250)
+    email = models.EmailField()
+
+    def __str__(self):
+        return f'Name: {self.fullname} Email: {self.email}'
+```
 
 ---
 
-## User Authentication
+## 15. User Authentication (Signup, Login, Logout)
 
-### Signup View
+### Signup
+
+Create an `authz` (or similarly named) app dedicated to authentication, with a `signup.html` template and a class-based view.
 
 ```python
-from django.views import View
 from django.contrib.auth.models import User
 from django.contrib import messages
-from django.shortcuts import render, redirect, resolve_url
 
 class SignupView(View):
     def get(self, request):
@@ -491,109 +581,102 @@ class SignupView(View):
         lastname = request.POST.get("lastname")
         password = request.POST.get("password")
 
-        if not all([username, email, firstname, lastname, password]):
-            messages.error(request, "All fields are required.")
+        if not username or not email or not firstname or not lastname or not password:
+            messages.error(request, "All fields are required")
             return render(request, 'signup.html')
 
         if len(password) < 8:
-            messages.error(request, "Password must be at least 8 characters.")
+            messages.error(request, "Password is too short")
             return render(request, 'signup.html')
 
+        # Normalize case to prevent duplicate accounts differing only by case
         username = username.lower()
         email = email.lower()
 
         if User.objects.filter(username=username).exists():
-            messages.error(request, "Username is already taken.")
+            messages.error(request, "Username is taken")
             return render(request, 'signup.html')
 
         if User.objects.filter(email=email).exists():
-            messages.error(request, "An account with this email already exists.")
+            messages.error(request, "Email already exists")
             return render(request, 'signup.html')
 
         user = User.objects.create(
             username=username,
             email=email,
             first_name=firstname,
-            last_name=lastname
+            last_name=lastname,
         )
+        # Passwords are always hashed — never assign them directly on create()
         user.set_password(password)
         user.save()
-
-        return redirect(resolve_url('home'))
 ```
 
-> **Note:** Always set the password using `set_password()`, saving it directly stores it as plain text, which is a security risk.
+> Inspect Django's built-in `User` model (Ctrl+Click on `User` in your editor) to confirm exact field names, such as `first_name`.
 
-Add the path in `urls.py`:
+Register the view:
 
 ```python
-from authapp.views import SignupView
+from authz.views import SignupView
 
-urlpatterns = [
-    path('signup', SignupView.as_view(), name='signup'),
-]
+path('signup', SignupView.as_view(), name='signup')
 ```
 
-### Login View
+Add a link to `signup` in your site navigation (`base.html`).
+
+### Login
 
 ```python
 from django.contrib.auth import login, logout, authenticate
 
-def login_view(request):
+def Loginview(request):
     if request.method == "POST":
-        next_page = request.GET.get('next')
         username = request.POST.get("username")
         password = request.POST.get("password")
 
         if not username or not password:
-            messages.error(request, "All fields are required.")
+            messages.error(request, "All fields are required")
             return render(request, 'login.html')
 
         username = username.lower()
-        user_exists = User.objects.filter(username=username).first()
+        username_exists = User.objects.filter(username=username).first()
 
-        if not user_exists:
-            messages.error(request, "Invalid login credentials.")
+        if not username_exists:
+            messages.error(request, "Invalid login credentials")
             return render(request, 'login.html')
 
         user = authenticate(username=username, password=password)
-
-        if user:
-            login(request, user)
-            messages.success(request, "Login successful.")
-            return redirect(next_page or resolve_url('home'))
+        login(request, user)
+        messages.success(request, "Successful Login")
+        return redirect(resolve_url('home'))
 
     return render(request, 'login.html')
 ```
 
-### Logout View
+### Logout
 
 ```python
-def logout_view(request):
+def Logoutview(request):
     logout(request)
     return render(request, 'login.html')
 ```
 
-### Conditional Navigation in Templates
+Register both paths in `urls.py` and add them to the site navigation.
 
-Show different nav items based on whether the user is logged in:
+### Conditional navigation based on login state
 
 ```html
 {% if user.is_authenticated %}
-    <li><a href="{% url 'logout' %}">Logout</a></li>
+  <li><a href="{% url 'logout' %}">Logout</a></li>
 {% else %}
-    <li><a href="{% url 'signup' %}">Sign Up</a></li>
-    <li><a href="{% url 'login' %}">Login</a></li>
+  <li><a href="{% url 'signup' %}">Signup</a></li>
+  <li><a href="{% url 'login' %}">Login</a></li>
 {% endif %}
 ```
 
 ---
 
-## Login-Required Protection
-
-Restrict views to authenticated users only.
-
-### Function-Based Views
+## 16. Restricting Access to Logged-In Users
 
 ```python
 from django.contrib.auth.decorators import login_required
@@ -603,28 +686,42 @@ def homepage(request):
     return render(request, 'home.html')
 ```
 
-### Class-Based Views
+Tell Django where to send unauthenticated users, in `settings.py`:
 
 ```python
-from django.contrib.auth.mixins import LoginRequiredMixin
-
-class DashboardView(LoginRequiredMixin, View):
-    def get(self, request):
-        return render(request, 'dashboard.html')
+LOGIN_URL = 'authz/login'
 ```
 
-In `settings.py`, set the login redirect URL:
+### Redirecting back to the originally requested page
+
+Capture the `next` parameter so users land on the page they originally tried to access after logging in:
 
 ```python
-LOGIN_URL = 'authapp/login'
+def Loginview(request):
+    if request.method == "POST":
+        next_page = request.GET.get('next')
+        username = request.POST.get("username")
+        password = request.POST.get("password")
+
+        if not username or not password:
+            messages.error(request, "All fields are required")
+            return render(request, "login.html")
 ```
 
 ---
 
-## Static Files (CSS, JS, Images)
+## 17. Static Files (CSS, JS, Images)
 
-1. Create a `static` folder at the root level of your project.
-2. In `settings.py`, add after `STATIC_URL`:
+Create a `static/` folder at the project root for CSS, JS, and images.
+
+Load the `static` template tag at the top of the page, before `<!DOCTYPE>`, and link the stylesheet:
+
+```html
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+```
+
+In `settings.py`, after the `pathlib` import, add:
 
 ```python
 import os
@@ -632,135 +729,414 @@ import os
 STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'),)
 ```
 
-3. Link your stylesheet in templates. Load static at the top of the file:
-
-```html
-{% load static %}
-<!DOCTYPE html>
-<html>
-<head>
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
-</head>
-```
-
-4. Reference images:
-
-```html
-{% load static %}
-<img src="{% static 'assets/image.png' %}" alt="description" width="250px">
-```
-
-For page-specific styles, define a block in `base.html`:
-
-```html
-{% block styles %}{% endblock styles %}
-```
-
-Then in child pages (remember to load static after `extends`):
+For per-page styling, define a `style` block in the base template and override it per page. Remember to load `static` below `extends`:
 
 ```html
 {% extends 'base.html' %}
 {% load static %}
+```
 
-{% block styles %}
-    <link rel="stylesheet" href="{% static 'css/about.css' %}">
-{% endblock styles %}
+Referencing an image:
+
+```html
+<img src="{% static 'assets/6.png' %}" alt="contact image" width="250px">
 ```
 
 ---
 
-## Media & File Uploads
+## 18. Media & File Uploads
 
-1. Create a `media` folder at the root level.
-2. Add the following to `settings.py`:
+Create a `media/` folder at the project root, then configure it in `settings.py`:
 
 ```python
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 ```
 
-3. In your model, use `upload_to` to organize uploads into subfolders:
-
 ```python
-image = models.ImageField(upload_to="products/")
+image = models.ImageField(upload_to="product/")
 ```
 
-> **Note:** Handling image fields requires the Pillow library:
+`upload_to` organizes uploads into subfolders inside `media/` — useful since uploads can originate from different parts of the app.
+
+Track creation and update timestamps:
+
+```python
+created_at = models.DateTimeField(auto_now_add=True)  # newest first
+updated_at = models.DateTimeField(auto_now=True)
+```
+
+> Any model with an image or file field requires **Pillow**:
 > ```bash
 > pip install pillow
 > ```
 
 ---
 
-## Comments in Python
+## 19. .gitignore
+
+Generate a `.gitignore` file at [gitignore.io](https://www.toptal.com/developers/gitignore) for your stack (e.g., Django, React), and paste its contents into your project.
+
+---
+
+## 20. Rendering and Linking Model Data
+
+Pass model data to a template via a context dictionary:
 
 ```python
-# This is a single-line comment
+class Products(LoginRequiredMixin, View):
+    def get(self, request):
+        all_products = Product.objects.all().order_by('-created_at')
+        context = {'all_productskey': all_products}
+        return render(request, 'products.html', context)
+```
 
-"""
-This is a multi-line comment
-or docstring.
-"""
+Loop through it in the template:
+
+```html
+<div class="all_products">
+  {% for prod in all_productskey %}
+    <div class="product-card">
+      <h3>Name: {{ prod.name }}</h3>
+      <img src="{{ prod.image.url }}" alt="{{ prod.name }}">
+      <p>Description: {{ prod.description }}</p>
+      <p>Quantity: {{ prod.quantity }}</p>
+      <p>Seller: {{ prod.user.username }}</p>
+    </div>
+  {% endfor %}
+</div>
+```
+
+> **Images not displaying?** Add media URL handling to your project's `urls.py`:
+> ```python
+> from django.conf import settings
+> from django.conf.urls.static import static
+>
+> urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+> ```
+
+### File uploads in forms
+
+Forms that upload files must include `enctype="multipart/form-data"`, or the file data won't be sent.
+
+---
+
+## 21. Editing Existing Records
+
+Use a dynamic URL segment for the record's ID:
+
+```python
+path('edit-product/<str:product_id>', EditProduct.as_view(), name='edit-product')
+```
+
+Verify ownership before allowing edits:
+
+```python
+class EditProduct(LoginRequiredMixin, View):
+    def get(self, request, product_id):
+        product = Product.objects.filter(id=product_id).first()
+        if not product:
+            return redirect(resolve_url("products"))
+        if product.user != request.user:
+            return redirect(resolve_url("products"))
+        context = {"product": product}
+        return render(request, 'edit_product.html', context)
+
+    def post(self, request, product_id):
+        product = Product.objects.filter(id=product_id).first()
+        if not product:
+            return redirect(resolve_url("products"))
+        if product.user != request.user:
+            return redirect(resolve_url("products"))
+
+        name = request.POST.get("name")
+        description = request.POST.get("description")
+        quantity = request.POST.get("quantity")
+        price = request.POST.get("price")
+        image = request.FILES.get("image")
+
+        product.name = name or product.name
+        product.description = description or product.description
+        product.price = price or product.price
+        product.quantity = quantity or product.quantity
+        product.image = image or product.image
+        product.save()
+
+        messages.success(request, "Product successfully updated")
+        return redirect(resolve_url("products"))
+```
+
+Pre-populate the edit form with existing values:
+
+```html
+<label for="">Name</label><br>
+<input type="text" name="name" required value="{{ product.name }}"><br>
+<label for="">Description</label><br>
+<textarea name="description">{{ product.description }}</textarea><br>
 ```
 
 ---
 
-## .gitignore
+## 22. JSON Responses
 
-Create a `.gitignore` file at the root of your project. Visit [gitignore.io](https://www.toptal.com/developers/gitignore), search for **Django**, copy the output, and paste it into your `.gitignore` file.
+Return a JSON list of records — useful for API-style endpoints.
+
+```python
+from django.http import JsonResponse
+from django.forms import model_to_dict
+
+def list_products(request):
+    all_products = Product.objects.all()
+    data = [
+        {'name': x.name, 'id': x.id, 'quantity': x.quantity, 'image': x.image.url}
+        for x in all_products
+    ]
+    return JsonResponse(data, safe=False)
+```
+
+Register the view:
+
+```python
+path("products/all", list_products, name="all-prod")
+```
 
 ---
 
-## Deploying to Render
+## 23. Readable Admin Labels
 
-1. Go to the [Render Dashboard](https://dashboard.render.com) and click **New + Web Service**.
-2. Connect your GitHub repository.
-3. Set **Runtime** to **Python**.
-
-### Prepare for Deployment
-
-Install Gunicorn (required by Render):
-
-```bash
-pip install gunicorn
-```
-
-Generate a 'requirements.txt' file in your project root:
-
-```bash
-pip freeze > requirements.txt
-```
-
-Push the changes to GitHub:
-
-```bash
-git add .
-git commit -m "Added requirements.txt"
-git push
-```
-
-### Update settings.py
-
-Update `ALLOWED_HOSTS` with your Render domain:
+Add a `__str__` method to any model so it's easy to identify in the admin dashboard:
 
 ```python
-ALLOWED_HOSTS = [
-    "your-app-name.onrender.com",
-    "localhost",
-    "127.0.0.1",
-]
+def __str__(self):
+    return f'{self.name} || {self.id}'
 ```
 
-Set `DEBUG` to `False` for production:
+---
+
+## 24. Slugs (SEO-Friendly URLs)
+
+Slugs make URLs more readable and search-engine friendly:
+
+```
+Without slug: 127.0.0.1:8000/members/details/1
+With slug:    127.0.0.1:8000/members/details/emil-refsnes
+```
+
+Add a `slug` field to the model:
 
 ```python
-DEBUG = False
+name = models.CharField(max_length=100)
+slug = models.SlugField(unique=True, blank=True)
 ```
 
-Push the final changes:
+Run migrations after adding the field.
+
+To auto-populate the slug from another field (e.g., a title), configure it in `admin.py`:
+
+```python
+class PostAdmin(admin.ModelAdmin):
+    list_display = ('title', 'author', 'status', 'featured', 'created_at')
+    prepopulated_fields = {'slug': ('title',)}
+    list_filter = ('status', 'featured', 'category')
+    search_fields = ('title', 'body')
+```
+
+> The slug is automatically "slugified" — hyphens replace spaces between words.
+
+### Using slugs instead of IDs throughout the project
+
+In templates:
+
+```html
+{% for category in categories %}
+  <a href="{% url 'category' category.slug %}" class="category-chip">{{ category.name }}</a>
+{% endfor %}
+
+<h4><a href="{% url 'detail' post.slug %}">{{ post.title }}</a></h4>
+<a href="{% url 'post_update' post.slug %}" class="btn-edit-action">Modify Content</a>
+```
+
+In `urls.py`, switch from `<int:id>` to `<slug:slug>`:
+
+```python
+path('', views.index_view, name='index'),
+path('post/write/', views.PostCreateView.as_view(), name='post_create'),
+path('post/<slug:slug>/', views.detail_view, name='detail'),
+path('post/<slug:slug>/edit/', views.PostUpdateView.as_view(), name='post_update'),
+path('post/<slug:slug>/delete/', views.PostDeleteView.as_view(), name='post_delete'),
+path('category/<slug:slug>/', views.category_view, name='category'),
+```
+
+In `views.py`, handle the slug instead of an ID:
+
+```python
+def category_view(request, slug):
+    category = get_object_or_404(Category, slug=slug)
+    posts = Post.objects.filter(category=category, status='published')
+    return render(request, 'blog/category.html', {'category': category, 'posts': posts})
+```
+
+---
+
+## 25. Custom Error Pages (404 / 500)
+
+Create a template, e.g. `error_404.html`:
+
+```html
+<h1>Page Not Found</h1>
+<p>The page you are looking for does not exist.</p>
+<a href="{% url 'home' %}">
+  <button>Go Home</button>
+</a>
+```
+
+> **4xx** errors originate on the client side (e.g., a broken or mistyped link). **5xx** errors originate on the server side (e.g., an unhandled exception in your code).
+
+Define the handler view:
+
+```python
+def error_404(request, exception):
+    return render(request, 'error_404.html', status=404)
+```
+
+Wire it up at the project level in `urls.py`:
+
+```python
+handler404 = 'product.views.error_404'
+handler500 = 'product.views.error_500'
+```
+
+---
+
+## 26. Secret Keys & Environment Variables
+
+Before deploying:
+
+1. Replace `SECRET_KEY` in `settings.py` with a securely generated value — for example, via [Djecrety](https://djecrety.ir/).
+2. Set `DEBUG = False`.
+3. Replace the local `db.sqlite3` database with a production-ready one, e.g. [Neon](https://console.neon.tech/) or [Supabase](https://supabase.com/).
+4. Install the PostgreSQL driver:
+   ```bash
+   pip install psycopg2
+   ```
+
+### Keeping secrets out of source control
+
+Create a `.env` file in the project root (alongside `manage.py`) to store secret values. Since `.env` is listed in `.gitignore`, it won't be pushed to GitHub.
+
+Install the packages needed to read it:
 
 ```bash
-git add .
-git commit -m "Configured for Render deployment"
-git push
+pip install python-decouple
+pip install dj-database-url
 ```
+
+In `settings.py`:
+
+```python
+from decouple import config
+import dj_database_url
+
+SECRET_KEY = config('SECRET_KEY')
+DEBUG = config('DEBUG', default=False, cast=bool)
+
+DATABASES = {
+    'default': dj_database_url.parse(config('DATABASE_URL'))
+}
+```
+
+Add your database connection URL (from Neon, Supabase, etc.) to `.env` as well.
+
+> If your server doesn't recognize the new database, deactivate the virtual environment, open a fresh terminal, and reactivate it.
+
+Since the online database is new, migrations must be re-applied:
+
+```bash
+python manage.py migrate
+python manage.py createsuperuser
+```
+
+---
+
+## 27. Cloud Storage for Media
+
+For production, store uploaded media in the cloud rather than locally — options include **Cloudinary** and **Google Cloud Storage**.
+
+---
+
+## 28. Deploying to Render
+
+1. Install Gunicorn (the WSGI server Render uses) — alternatives include Uvicorn or Daphne for ASGI:
+   ```bash
+   pip install gunicorn
+   ```
+2. Generate `requirements.txt` from the project root:
+   ```bash
+   pip freeze > requirements.txt
+   ```
+   Re-run this command whenever new packages are installed.
+3. Push to GitHub:
+   ```bash
+   git add .
+   git commit -m "Added requirements.txt"
+   git push
+   ```
+4. In the Render dashboard: **New +** → **Web Service** → connect your GitHub repo.
+5. Set the runtime to **Python**.
+6. Start command:
+   ```bash
+   gunicorn project-name.wsgi:application
+   ```
+7. Under environment variables, import directly from your `.env` file (including the secret key).
+8. Update `ALLOWED_HOSTS` in `settings.py`:
+   ```python
+   ALLOWED_HOSTS = [
+       "django-python-test.onrender.com",
+       "localhost",
+       "127.0.0.1",
+   ]
+   ```
+   Or, to allow any Render subdomain:
+   ```python
+   ALLOWED_HOSTS = [
+       "django-python-test.onrender.com",
+       ".onrender.com",
+   ]
+   ```
+9. Set `DEBUG = False`.
+10. Push the changes:
+    ```bash
+    git add .
+    git commit -m "Configured ALLOWED_HOSTS for Render"
+    git push
+    ```
+
+---
+
+## 29. Serving Static Files in Production (WhiteNoise)
+
+If static files don't display correctly after deployment, configure **WhiteNoise**.
+
+1. Confirm `STATIC_ROOT` is set in `settings.py`:
+   ```python
+   STATIC_ROOT = BASE_DIR / "static"
+   ```
+2. Add the WhiteNoise middleware directly after `SecurityMiddleware`:
+   ```python
+   MIDDLEWARE = [
+       # ...
+       "django.middleware.security.SecurityMiddleware",
+       "whitenoise.middleware.WhiteNoiseMiddleware",
+       # ...
+   ]
+   ```
+3. Install WhiteNoise and update dependencies:
+   ```bash
+   pip install whitenoise
+   pip freeze > requirements.txt
+   ```
+4. Commit and push the changes.
+
+---
+
+*This guide is a living document, updated as new concepts and patterns are learned.*
