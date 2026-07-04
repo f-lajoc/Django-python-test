@@ -345,7 +345,7 @@ git push`
 - Connect your GitHub repo:
 - Fill manually: Runtime → Python
 - for the start command box: $ gunicorn project-name.wsgi:application
-- for environment variable: click import from .env file, then copy and paste everything in the .env file including secret key and paste there, change debug value to true like that so we can deploy
+- for environment variable: click import from .env file, then copy and paste everything in the .env file including secret key and paste there
 - Open the settings.py and change the 'ALLOWED_HOSTS = []' to `ALLOWED_HOSTS = [
     "django-python-test.onrender.com",
     "localhost",
