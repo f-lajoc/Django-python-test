@@ -332,6 +332,7 @@ def homepage(request):
 - create a .gitignore file, go to gitignore.io, search for the software you're using on it (Django, React), copy and paste everything in the gitignore
 
 # To Deploy ( on Render)
+- we can deply projects with backend on render, vercel, pythonanywhere
 - when deploying, wsgi server we can use is gunicorn or asgi server we can use is uvicorn, daphne
 - On terminal install gunicorn `pip install gunicorn`, Render needs it.
 - then Generate requirements.txt with `pip freeze > requirements.txt`, ensure you're at the root folder, this lists all our installed packages with their version, also you can rerun it whenever you install some other packages so that it can update
@@ -343,8 +344,8 @@ git push`
 - Click: New + → Web Service
 - Connect your GitHub repo:
 - Fill manually: Runtime → Python
-
-
+- for the start command box: $ gunicorn project-name.wsgi:application
+- for environment variable: click import from .env file, then copy and paste everything in the .env file including secret key and paste there, change debug value to true like that so we can deploy
 - Open the settings.py and change the 'ALLOWED_HOSTS = []' to `ALLOWED_HOSTS = [
     "django-python-test.onrender.com",
     "localhost",
@@ -521,3 +522,14 @@ note: change database from the `db.sqlite3` we have for our project to one usabl
 
 # Cloud for media
 - we can create a cloud to save our medias in it instead of locally, use 'Cloudinary, Google Cloud e.t.c'
+  
+# static file not displaying properly on deployement, use WhitNoise
+- Make sure staticfiles is configured correctly in settings.py file `STATIC_ROOT = BASE_DIR / "static"`
+- Enable WhiteNoise- The WhiteNoise middleware should be placed directly after the Django SecurityMiddleware and before all other middleware e.g 
+`MIDDLEWARE = [
+    # ...
+    "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
+    # ...
+]`
+- then install whitenoise, run `pip install whitenoise`, rerun `pip freeze > requirements.txt  ` to add it to requirements.txt and commit changes
