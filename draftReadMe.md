@@ -497,11 +497,11 @@ note: error 400 and above is error from udserend, maybe they navigated to page t
 - the define the error in views.py e.g `def error_404(request, exception):
       return render(request, 'error_404.html', status=404)`
 - then go to project level urls.py, create two variables called `handler404` and `handler500`, then direct them to the error message e.g `handler404 = 'product.views.error_404'` and `handler500 = 'product.views.error_500'` i.e it should go to our product app, the views and the error fuction there
+  
 # secret key
 - in your project settings.py file, change your `SECRET_KEY` to something secure, you can search for 'django secret key generator' online site:https://djecrety.ir/ , and generate a secret key
 note: change `DEBUG` to `False` before deployment
 note: change database from the `db.sqlite3` we have for our project to one usable for production. one of the databases we can use is "Neon (https://console.neon.tech/)" or "superbase (https://supabase.com/)", create account on them
-
 
 - then to connect to a postgress database, we need to install an engine called 'psycopg2'. run `pip install psycopg2`
 - when we have secret key that we dont want to be exposed, we create an environment variable file for it and use python decouple to read the environment variable e.g create a file named '.env' file In your project root (the same folder that contains manage.py), so all secret keys can be kept in there and the file will not be pushed to github because its in listed .gitignignore file
