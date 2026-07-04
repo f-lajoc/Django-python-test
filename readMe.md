@@ -1,7 +1,5 @@
 ﻿# Django Setup & Development Guide
 
-## Overview
-
 A practical, step-by-step reference for building a Django web application from scratch — environment setup, routing, templates, forms, models, authentication, file uploads, error handling, and deployment to Render.
 
 This guide is written as a working reference for Django beginners and as a personal knowledge base compiled while learning the framework hands-on.
@@ -11,7 +9,6 @@ This guide is written as a working reference for Django beginners and as a perso
 ## Table of Contents
 
 - [Django Setup \& Development Guide](#django-setup--development-guide)
-  - [Overview](#overview)
   - [Table of Contents](#table-of-contents)
   - [1. Prerequisites](#1-prerequisites)
     - [Check if Python is installed](#check-if-python-is-installed)
@@ -1087,7 +1084,7 @@ For production, store uploaded media in the cloud rather than locally — option
    ```bash
    gunicorn project-name.wsgi:application
    ```
-7. Under environment variables, import directly from your `.env` file (including the secret key).
+7. Environment variables: import directly from your `.env` file by copying and pasting it to render (including the secret key).
 8. Update `ALLOWED_HOSTS` in `settings.py`:
    ```python
    ALLOWED_HOSTS = [
