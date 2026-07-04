@@ -331,21 +331,28 @@ def homepage(request):
 
 - create a .gitignore file, go to gitignore.io, search for the software you're using on it (Django, React), copy and paste everything in the gitignore
 
-# To deploy on Render
+# To Deploy ( on Render)
+- when deploying, wsgi server we can use is gunicorn or asgi server we can use is uvicorn, daphne
+- On terminal install gunicorn `pip install gunicorn`, Render needs it.
+- then Generate requirements.txt with `pip freeze > requirements.txt`, ensure you're at the root folder, this lists all our installed packages with their version, also you can rerun it whenever you install some other packages so that it can update
+- Push to GitHub `git add .
+git commit -m "Added requirements.txt"
+git push`
 
 - Go to: Render Dashboard
 - Click: New + → Web Service
 - Connect your GitHub repo:
 - Fill manually: Runtime → Python
-- On terminal install gunicorn `pip install gunicorn`, Render needs it.
-- then Generate requirements.txt with `pip freeze > requirements.txt`, ensure you're at the root folder
-- Push to GitHub `git add .
-git commit -m "Added requirements.txt"
-git push`
+
+
 - Open the settings.py and change the 'ALLOWED_HOSTS = []' to `ALLOWED_HOSTS = [
     "django-python-test.onrender.com",
     "localhost",
     "127.0.0.1",
+]`
+- or use this instead, The .onrender.com allows all Render subdomains. `ALLOWED_HOSTS = [
+    "django-python-test.onrender.com",
+    ".onrender.com",
 ]`
 - Also change: 'DEBUG = True' to `DEBUG = False`
   -then Push to GitHub `git add .
@@ -436,3 +443,81 @@ git push`
   def __str__(self):
     return f' {self.name} || {self.id}'
 ```
+# models slug
+- it is used in url's to make them easier to read and search engine friendly
+- Url Without Slug: 127.0.0.1:8000/members/details/1 vs Url With Slug: 127.0.0.1:8000/members/details/emil-refsnes
+- go to models.py file and add a field called slug in the model, use the data type SlugField: e.g reference to Afriblog blog models.py file
+```class Category(models.Model):
+    name = models.CharField(max_length=100)
+    slug = models.SlugField(unique=True, blank=True)
+```
+- then makemigrations nd migrate to update the database
+- if we want this field to be updated automatically when we set the title, we use `prepopulated_fields ` 
+- go to admin.py and add it e.g ref to Afriblog blog admin.py file ```
+  class PostAdmin(admin.ModelAdmin):
+    list_display = ('title', 'author', 'status', 'featured', 'created_at')
+    prepopulated_fields = {'slug': ('title',)}
+    list_filter = ('status', 'featured', 'category')
+    search_fields = ('title', 'body')```
+
+n:b the "slug" field will be auto populated with the title, and since the it is of type SlugField, it will "slugify" the value, meaning it will put a hyphen between each word.
+  - we can replace the ID field with the slug field throughout the project. e.g ref to Afriblog >blog> template > blog index.html, detail.html, category.html
+  ```
+    {% for category in categories %}
+        <a href="{% url 'category' category.slug %}" class="category-chip">{{ category.name }}</a>
+    {% endfor %}
+ <h4><a href="{% url 'detail' post.slug %}">{{ post.title }}</a></h4>}
+  <a href="{% url 'post_update' post.slug %}" class="btn-edit-action">Modify Content</a>
+```
+- then go to urls.py, Change from <int:id> to <slug:slug> e.g ref to Afriblog blog urls.py file
+```urlpatterns = [
+     path('', views.index_view, name='index'),
+    path('post/write/', views.PostCreateView.as_view(), name='post_create'),
+    path('post/<slug:slug>/', views.detail_view, name='detail'),
+    path('post/<slug:slug>/edit/', views.PostUpdateView.as_view(), name='post_update'),
+    path('post/<slug:slug>/delete/', views.PostDeleteView.as_view(), name='post_delete'),
+    path('category/<slug:slug>/', views.category_view, name='category'),
+]```
+- then finally go to views.py, change the details view to handle incoming request as slug instead of ID e.g ref to Afriblog blog views.py file
+```def category_view(request, slug):
+    category = get_object_or_404(Category, slug=slug)
+    posts = Post.objects.filter(category=category, status='published')
+    return render(request, 'blog/category.html', {'category': category, 'posts': posts})
+  ```
+# custom error messages
+- create a html file for it in our template e.g 
+- ```{% block main %}
+    <h1>Page Not Found</h1>
+    <p>The page you are looking for does not exist.</p>
+    <a href="{% url 'home' %}">
+        <button>Go Home</button>
+    </a>
+{% endblock %}```
+note: error 400 and above is error from udserend, maybe they navigated to page that doesnt exist while error 500 and above is from our end, maybe there was a break in our code
+- the define the error in views.py e.g `def error_404(request, exception):
+      return render(request, 'error_404.html', status=404)`
+- then go to project level urls.py, create two variables called `handler404` and `handler500`, then direct them to the error message e.g `handler404 = 'product.views.error_404'` and `handler500 = 'product.views.error_500'` i.e it should go to our product app, the views and the error fuction there
+# secret key
+- in your project settings.py file, change your `SECRET_KEY` to something secure, you can search for 'django secret key generator' online site:https://djecrety.ir/ , and generate a secret key
+note: change `DEBUG` to `False` before deployment
+note: change database from the `db.sqlite3` we have for our project to one usable for production. one of the databases we can use is "Neon (https://console.neon.tech/)" or "superbase (https://supabase.com/)", create account on them
+
+
+- then to connect to a postgress database, we need to install an engine called 'psycopg2'. run `pip install psycopg2`
+- when we have secret key that we dont want to be exposed, we create an environment variable file for it and use python decouple to read the environment variable e.g create a file named '.env' file In your project root (the same folder that contains manage.py), so all secret keys can be kept in there and the file will not be pushed to github because its in listed .gitignignore file
+- then clear the key value and python decouple can read it
+- then install these two `pip install python-decouple` and `pip install dj-database-url`
+- in settings.py file, import config from decouple whcich reads .env file, and dj-database-url  which allows us to connect to a database url using connection url  i.e `from decouple import config` and `import  dj_database_url`
+- then in settings.py file, use config and the key of the key-value pair saved in .env file e.g `SECRET_KEY = config('SECRET_KEY')`, for debug, so the decoder doesnt read it as string, we add `cast=bool` e.g `DEBUG = config('DEBUG', default=False, cast=bool)`
+- Also put the database url you get from neon(or other database) in .env file
+- create or replace the database key in settings.py file and parse the database url into the default e.g 
+  `DATABASES = {
+    'default': dj_database_url.parse(config('DATABASE_URL')
+    )
+}`
+- if on server run, it doesnt recognize the database, just deactivate the env. i.e run `deactivate`, then delete and open a new terminal, then reactivate env
+- the reason we have unapplied migrations is bacuse we migrated on the previous local database, but this is a new online database, so we habve to run migration again i.e `python manage.py migrate`
+- create user on the online db since it doesnt have any data yet, the prev data we have is on local db so run `python manage.py createsuperuser`
+
+# Cloud for media
+- we can create a cloud to save our medias in it instead of locally, use 'Cloudinary, Google Cloud e.t.c'

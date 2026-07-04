@@ -20,6 +20,7 @@
  {% if prod.user == user %}
  <a href="{% url 'edit-product' prod.id %}"> <button class="buy-btn">Edit</button></a>
  <a href="{% url 'delete-product' prod.id %}"> <button class="buy-btn">Delete</button></a>
+ <a href="{% url 'transactions-product' prod.id %}"> <button class="buy-btn">Transactions</button></a>
  
  {% else %}
   <a href="{% url 'buy-product' prod.id %}"> <button class="buy-btn">Buy</button></a>

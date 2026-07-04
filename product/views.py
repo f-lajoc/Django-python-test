@@ -1,8 +1,11 @@
+from urllib import request
+
 from django.shortcuts import render, redirect, resolve_url, get_object_or_404
 from django.views import View
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
-from product.models import Product
+import product
+from product.models import Product, ProductTransaction
 from django.http import JsonResponse
 from django.forms import model_to_dict
 from django.contrib import messages
@@ -124,8 +127,39 @@ def buy_product(request, product_id):
          if product.quantity < quantity:
             messages.error(request, "Not enough products in stock")
             return redirect(resolve_url("buy-product"))
-         product.quantity -= quantity
+         product.quantity = product.quantity - quantity
+
+         product.sold  += quantity
+         ProductTransaction.objects.create(
+            product = product,
+            buyer =  request.user,
+            quantity = quantity,
+            quantity_after = product.quantity,
+            price = product.price,
+         )
          product.save()
          messages.success(request, "Product successfully bought")
          return redirect(resolve_url("products"))
       return render(request, 'buy-product.html')
+
+@login_required
+def product_transactions(request, product_id):
+   product = Product.objects.filter(id=product_id).first()
+   if not product:
+      return redirect(resolve_url("products"))
+   if product.user != request.user:
+      return redirect(resolve_url("products"))
+   transactions = ProductTransaction.objects.filter(product=product).order_by('-created_at')
+   context = {
+      
+   }
+   return render(request, 'transactions.html', {
+      'transactions': transactions,
+      'product': product
+   })
+
+def error_404(request, exception):
+      return render(request, 'error_404.html', status=404)
+
+def error_500(request):
+      return render(request, 'error 500.html', status=500)
